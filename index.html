@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reptiDON — Scienza e Terraristica</title>
+    <meta name="description" content="Guide scientifiche alla cura di rettili e aracnidi. Dati reali, costi verificati, zero sensazionalismo.">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+    /* ── BASE ── */
+    body {
+        padding-top: 0;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+    img { height: auto; }
+    .carousel-placeholder { min-height: 320px; }
+    .ad-unit { max-width: 380px; width: 100%; }
+    .badge-xs { font-size: 0.6rem; }
+    .card-premium-locked { opacity: 0.55; pointer-events: none; }
+    #firmaField { transition: opacity 0.2s ease; }
+
+    /* ── SPLASH SCREEN ── */
+    #rD-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #020602;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        transition: opacity 0.65s ease;
+        cursor: pointer;
+    }
+    #rD-splash.rD-splash-out {
+        opacity: 0;
+        pointer-events: none;
+    }
+    #rD-splash-glow {
+        position: absolute;
+        width: 320px; height: 320px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(74,222,128,0.11) 0%, transparent 65%);
+        filter: blur(50px);
+        transform: scale(0.15);
+        transition: transform 1.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    #rD-splash-snake {
+        opacity: 0;
+        transform: translateY(32px);
+        transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1) 0.05s,
+                    transform 0.85s cubic-bezier(0.16,1,0.3,1) 0.05s;
+    }
+    #rD-splash-logo {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(2rem, 9vw, 2.6rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #f0fdf4;
+        line-height: 1;
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.65s cubic-bezier(0.16,1,0.3,1),
+                    transform 0.65s cubic-bezier(0.16,1,0.3,1);
+    }
+    #rD-splash-logo span { color: #4ade80; }
+    #rD-splash-tagline {
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        font-family: monospace;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    #rD-splash-bar {
+        position: absolute;
+        bottom: 0; left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        box-shadow: 0 0 8px #4ade80;
+        width: 0%;
+        transition: width 0.85s cubic-bezier(0.4,0,0.2,1);
+    }
+    #rD-splash-skip {
+        position: absolute;
+        bottom: 20px;
+        font-size: 0.62rem;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 0.1em;
+        opacity: 0;
+        transition: opacity 0.4s ease 0.2s;
+    }
+
+    /* ── BOTTOM NAVBAR ── */
+    #rD-navbar {
+        position: fixed;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 20px);
+        max-width: 440px;
+        z-index: 1000;
+    }
+    #rD-navbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        padding: 10px 6px;
+        background: rgba(8,14,8,0.92);
+        backdrop-filter: blur(28px) saturate(1.9);
+        -webkit-backdrop-filter: blur(28px) saturate(1.9);
+        border-radius: 26px;
+        border: 1px solid rgba(74,222,128,0.16);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.55),
+                    inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .rD-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        background: transparent;
+        border: none;
+        width: 44px;
+        min-height: 50px;
+        border-radius: 12px;
+        padding: 0;
+        color: rgba(255,255,255,0.5);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+                    color 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        text-decoration: none;
+    }
+    .rD-nav-item:disabled,
+    .rD-nav-item[aria-disabled="true"] {
+        color: rgba(255,255,255,0.2);
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    .rD-nav-item:active { transform: scale(0.88); }
+    .rD-nav-item .rD-nav-label {
+        font-size: 0.52rem;
+        letter-spacing: 0.04em;
+        line-height: 1;
+    }
+    .rD-nav-item.active { color: #4ade80; }
+    .rD-nav-item.active .rD-nav-label { font-weight: 600; }
+
+    /* Icona Home — centrale più grande */
+    #rD-nav-home {
+        position: relative;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: none;
+        background: radial-gradient(circle at 32% 32%, #1c2e1c, #090e09);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.05),
+                    0 4px 14px rgba(0,0,0,0.4);
+        cursor: pointer;
+        flex-shrink: 0;
+        color: rgba(255,255,255,0.65);
+        -webkit-tap-highlight-color: transparent;
+        text-decoration: none;
+        transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+                    color 0.3s ease, box-shadow 0.3s ease;
+    }
+        #rD-nav-home { display: flex; }
+    #rD-nav-home:active { transform: scale(0.88); }
+
+    #rD-nav-home.active {
+        color: #4ade80;
+        box-shadow: 0 0 0 1px rgba(74,222,128,0.25),
+                    0 6px 20px rgba(0,0,0,0.5),
+                    inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    /* Prisma ring Home — pseudo-elemento animato via JS */
+    #rD-nav-home::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg,
+            rgba(255,0,51,0.6), rgba(255,106,0,0.6), rgba(255,224,0,0.6),
+            rgba(0,255,136,0.6), rgba(0,195,255,0.6), rgba(155,0,255,0.6),
+            rgba(255,0,51,0.6));
+        -webkit-mask: radial-gradient(circle, transparent 23px, black 24px);
+        mask: radial-gradient(circle, transparent 23px, black 24px);
+        opacity: 0.5;
+        transition: opacity 0.4s ease;
+    } 
+    #rD-nav-home.active::before { opacity: 1; }
+
+    /* Badge presto */
+    .rD-nav-presto {
+        position: absolute;
+        top: 2px; right: 2px;
+        font-size: 0.4rem;
+        background: rgba(251,191,36,0.18);
+        color: #fbbf24;
+        border-radius: 99px;
+        padding: 1px 4px;
+        letter-spacing: 0.03em;
+        pointer-events: none;
+    }
+
+    /* Neighbor scale — aggiunto via JS */
+    .rD-neighbor { transform: scale(1.08); }
+
+    /* Landscape: sidebar sinistra */
+    @media (orientation: landscape) and (max-height: 500px) {
+        #rD-navbar { display: none; }
+        #rD-sidebar { display: flex; }
+        body { padding-bottom: 0; padding-left: calc(64px + env(safe-area-inset-left, 0px)); }
+    }
+    @media not ((orientation: landscape) and (max-height: 500px)) {
+        #rD-sidebar { display: none; }
+    }
+
+    /* ── SIDEBAR LANDSCAPE ── */
+    #rD-sidebar {
+        position: fixed;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 5px;
+        gap: 3px;
+        background: rgba(8,14,8,0.92);
+        backdrop-filter: blur(28px) saturate(1.9);
+        -webkit-backdrop-filter: blur(28px) saturate(1.9);
+        border-radius: 22px;
+        border: 1px solid rgba(74,222,128,0.16);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.55);
+        min-width: 48px;
+    }
+    #rD-sidebar .rD-sb-logo {
+        font-size: 0.6rem;
+        font-weight: 800;
+        color: #4ade80;
+        font-family: Georgia, serif;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
+    }
+    #rD-sidebar .rD-sb-divider {
+        width: 18px; height: 1px;
+        background: rgba(74,222,128,0.16);
+        margin-bottom: 2px;
+    }
+    .rD-sb-btn {
+        width: 40px; height: 40px;
+        border-radius: 13px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: rgba(255,255,255,0.5);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .rD-sb-btn.active {
+        background: rgba(74,222,128,0.14);
+        border-color: rgba(74,222,128,0.16);
+        color: #4ade80;
+    }
+    #rD-sb-home {
+        position: relative;
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: radial-gradient(circle at 32% 32%, #1c2e1c, #090e09);
+        color: rgba(255,255,255,0.6);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 3px 0;
+        -webkit-tap-highlight-color: transparent;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    #rD-sb-home.active { color: #4ade80; }
+    #rD-sb-home::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg,
+            rgba(255,0,51,0.6), rgba(255,106,0,0.6), rgba(255,224,0,0.6),
+            rgba(0,255,136,0.6), rgba(0,195,255,0.6), rgba(155,0,255,0.6),
+            rgba(255,0,51,0.6));
+        -webkit-mask: radial-gradient(circle, transparent 17px, black 18px);
+        mask: radial-gradient(circle, transparent 17px, black 18px);
+        opacity: 0.45;
+        transition: opacity 0.4s ease;
+    }
+    #rD-sb-home.active::before { opacity: 1; }
+
+    /* ── KEYFRAMES ── */
+    @keyframes rD-prisma {
+        to { --rD-angle: 360deg; }
+    }
+    </style>
+</head>
+<body>
+
+<!-- ── SPLASH SCREEN ── -->
+<div id="rD-splash" role="dialog" aria-label="Schermata di benvenuto reptiDON" aria-modal="true">
+    <div id="rD-splash-glow" aria-hidden="true"></div>
+    <div id="rD-splash-snake" aria-hidden="true">
+        <svg width="68" height="68" viewBox="0 0 68 68" fill="none" aria-hidden="true">
+            <path d="M17 54 C17 37, 8 27, 17 17 C26 7, 46 12, 50 23 C54 34, 44 43, 34 38 C24 33, 22 22, 33 19"
+                  stroke="#4ade80" stroke-width="5" stroke-linecap="round"/>
+            <ellipse cx="33" cy="19" rx="4.5" ry="3.2" fill="#4ade80"/>
+            <circle cx="31.2" cy="17.8" r="1.2" fill="#020602"/>
+            <circle cx="35" cy="17.8" r="1.2" fill="#020602"/>
+            <path d="M32 21 L31 24 M34.5 21 L35.5 24" stroke="#020602" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div id="rD-splash-logo">repti<span>DON</span></div>
+    <div id="rD-splash-tagline">Scienza &middot; Terraristica &middot; Dati Reali</div>
+    <div id="rD-splash-bar" aria-hidden="true"></div>
+    <div id="rD-splash-skip" aria-hidden="true">tocca per saltare</div>
+</div>
+
+<!-- ── BOTTOM NAVBAR ── -->
+<nav id="rD-navbar" aria-label="Navigazione principale">
+    <div id="rD-navbar-inner">
+
+        <a href="specie_v4.1.html"
+           class="rD-nav-item"
+           id="rD-nav-species"
+           aria-label="Guide alle specie">
+            <i class="bi bi-journal-text" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">Specie</span>
+        </a>
+
+                <button class="rD-nav-item"
+                id="rD-nav-profile"
+                aria-label="Accedi o registrati"
+                data-bs-toggle="modal"
+                data-bs-target="#registrationModal">
+            <i id="rD-nav-profile-icon" class="bi bi-person-circle" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label" id="rD-nav-profile-label">Accedi</span>
+        </button>
+
+
+        <a href="index_v4.1.html"
+           id="rD-nav-home"
+           aria-label="Home reptiDON"
+           class="active">
+            <i class="bi bi-house-fill" style="font-size:1.3rem;" aria-hidden="true"></i>
+        </a>
+
+        <button class="rD-nav-item"
+                aria-disabled="true"
+                aria-label="Mockup 3D — disponibile a breve"
+                style="position:relative;">
+            <i class="bi bi-box-fill" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">3D</span>
+            <span class="rD-nav-presto" aria-hidden="true">presto</span>
+        </button>
+
+                <button class="rD-nav-item"
+                id="rD-nav-feedback"
+                aria-label="Feedback community"
+                onclick="document.getElementById('feedback').scrollIntoView({behavior:'smooth'})">
+            <i class="bi bi-chat-quote" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">Feedback</span>
+        </button>
+
+
+    </div>
+</nav>
+
+<!-- ── SIDEBAR LANDSCAPE ── -->
+<nav id="rD-sidebar" aria-label="Navigazione principale">
+    <span class="rD-sb-logo" aria-hidden="true">rD</span>
+    <div class="rD-sb-divider" aria-hidden="true"></div>
+
+    <a href="specie_v4.1.html" class="rD-sb-btn" aria-label="Guide alle specie">
+        <i class="bi bi-journal-text" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </a>
+    <button class="rD-sb-btn"
+            aria-label="Feedback"
+            onclick="document.getElementById('feedback').scrollIntoView({behavior:'smooth'})">
+        <i class="bi bi-chat-quote" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </button>
+    <a href="index_v4.1.html" id="rD-sb-home" class="active" aria-label="Home reptiDON">
+        <i class="bi bi-house-fill" style="font-size:1rem;" aria-hidden="true"></i>
+    </a>
+    <button class="rD-sb-btn" aria-disabled="true" aria-label="Mockup 3D — disponibile a breve" style="color:rgba(255,255,255,0.2);cursor:not-allowed;">
+        <i class="bi bi-box-fill" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </button>
+    <button class="rD-sb-btn"
+            id="rD-sb-profile"
+            aria-label="Accedi o registrati"
+            data-bs-toggle="modal"
+            data-bs-target="#registrationModal">
+        <i id="rD-sb-profile-icon" class="bi bi-person-circle" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </button>
+</nav>
+
+<header role="banner">
+    <div class="py-5 text-center bg-body-secondary border-bottom">
+        <div class="container py-lg-4">
+            <h1 class="display-3 fw-bold lh-1 mb-3">reptiDON</h1>
+            <p class="lead text-muted col-lg-7 mx-auto">
+                Scienza al servizio della terraristica.<br>
+                Guide verificate, costi reali, zero sensazionalismo.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap mt-4">
+                <a href="specie_v4.1.html" class="btn btn-success btn-lg px-4">
+                    <i class="bi bi-journal-text me-2" aria-hidden="true"></i>Guide alle specie
+                </a>
+                <button class="btn btn-outline-light btn-lg px-4"
+                        data-bs-toggle="modal" data-bs-target="#premioModal"
+                        aria-label="Scopri il tuo premio gratuito di registrazione">
+                    <i class="bi bi-gift me-2" aria-hidden="true"></i>Premio gratuito
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="false"
+         aria-label="Galleria fotografica reptiDON" aria-roledescription="carosello">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
+                    class="active" aria-current="true" aria-label="Diapositiva 1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"
+                    aria-label="Diapositiva 2"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"
+                    aria-label="Diapositiva 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="carousel-placeholder bg-dark-subtle d-flex align-items-center justify-content-center">
+                    <p class="text-muted mb-0 text-center small">
+                        <i class="bi bi-image fs-1 d-block mb-2" aria-hidden="true"></i>
+                        Placeholder — <code>assets/img/hero-1.webp</code>
+                    </p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="carousel-placeholder bg-dark-subtle d-flex align-items-center justify-content-center">
+                    <p class="text-muted mb-0 text-center small">
+                        <i class="bi bi-image fs-1 d-block mb-2" aria-hidden="true"></i>
+                        Placeholder — <code>assets/img/hero-2.webp</code>
+                    </p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <div class="carousel-placeholder bg-dark-subtle d-flex align-items-center justify-content-center">
+                    <p class="text-muted mb-0 text-center small">
+                        <i class="bi bi-image fs-1 d-block mb-2" aria-hidden="true"></i>
+                        Placeholder — <code>assets/img/hero-3.webp</code>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Diapositiva precedente</span>
+        </button>
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Diapositiva successiva</span>
+        </button>
+    </div>
+</header>
+
+<div class="ads-banner container d-none d-lg-flex justify-content-center gap-5 my-5"
+     aria-hidden="true">
+    <div class="ad-unit p-3 bg-body-secondary border rounded-3 d-flex align-items-center gap-3">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"
+             alt="" width="48" height="48" loading="lazy" aria-hidden="true"
+             class="rounded-2 bg-secondary-subtle flex-shrink-0">
+        <div class="small">
+            <span class="badge bg-secondary badge-xs d-block mb-1">Ad</span>
+            <strong>Terrari in vetro su misura</strong><br>
+            <span class="text-muted">Ventilazione ottimale, consegna in Italia</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-success ms-auto flex-shrink-0"
+                aria-label="Scopri i terrari sponsorizzati">Scopri</button>
+    </div>
+    <div class="ad-unit p-3 bg-body-secondary border rounded-3 d-flex align-items-center gap-3">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"
+             alt="" width="48" height="48" loading="lazy" aria-hidden="true"
+             class="rounded-2 bg-secondary-subtle flex-shrink-0">
+        <div class="small">
+            <span class="badge bg-secondary badge-xs d-block mb-1">Ad</span>
+            <strong>Mangime vivo selezionato</strong><br>
+            <span class="text-muted">Grilli, blatte, tarme — spedizione rapida</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-success ms-auto flex-shrink-0"
+                aria-label="Acquista mangime vivo sponsorizzato">Acquista</button>
+    </div>
+</div>
+
+<main class="container">
+
+    <section id="personalizza" class="mb-5" aria-labelledby="personalizza-title">
+        <h2 id="personalizza-title" class="border-bottom pb-2 h4">
+            <i class="bi bi-grid-1x2 me-2 text-secondary" aria-hidden="true"></i>
+            Personalizza la tua Home
+        </h2>
+        <p class="text-muted mt-2 mb-4 small">
+            Configura il layout in base alle tue preferenze.
+            Alcune sezioni sono gratuite, altre riservate agli abbonati Premium.
+        </p>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card h-100 border-secondary">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-layout-text-window fs-2 text-success mb-3 d-block" aria-hidden="true"></i>
+                        <h3 class="h6 card-title">Ordine sezioni</h3>
+                        <p class="card-text small text-muted">Riordina i blocchi della homepage.</p>
+                        <span class="badge bg-success mb-2">Gratuito</span>
+                    </div>
+                    <div class="card-footer text-center py-2">
+                        <button class="btn btn-sm btn-outline-success"
+                                data-bs-toggle="modal" data-bs-target="#registrationModal">
+                            Configura
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-secondary">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-bookmark-star fs-2 text-success mb-3 d-block" aria-hidden="true"></i>
+                        <h3 class="h6 card-title">Specie preferite</h3>
+                        <p class="card-text small text-muted">Metti in evidenza le guide che usi di più.</p>
+                        <span class="badge bg-success mb-2">Gratuito</span>
+                    </div>
+                    <div class="card-footer text-center py-2">
+                        <button class="btn btn-sm btn-outline-success"
+                                data-bs-toggle="modal" data-bs-target="#registrationModal">
+                            Configura
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-secondary card-premium-locked" aria-disabled="true">
+                    <div class="card-body text-center py-4">
+                        <i class="bi bi-box-fill fs-2 text-warning mb-3 d-block" aria-hidden="true"></i>
+                        <h3 class="h6 card-title">
+                            Mockup 3D
+                            <i class="bi bi-lock-fill ms-1 text-warning" aria-hidden="true"></i>
+                        </h3>
+                        <p class="card-text small text-muted">Modelli interattivi degli animali nel terrario.</p>
+                        <span class="badge text-bg-warning mb-2">Premium — In arrivo</span>
+                    </div>
+                    <div class="card-footer text-center py-2">
+                        <button class="btn btn-sm btn-outline-warning" disabled>Non disponibile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="feedback" class="mb-5 p-4 bg-body-secondary rounded border"
+             aria-labelledby="feedback-title">
+        <h2 id="feedback-title" class="h4 mb-1">
+            <i class="bi bi-chat-quote me-2 text-secondary" aria-hidden="true"></i>
+            Feedback della community
+        </h2>
+        <p class="text-muted small mb-4">
+            Critiche, suggerimenti, o vuoi che aggiungiamo una specie specifica?
+            Le richieste con il maggior numero di adesioni vengono pubblicate per prime.
+            Condividi il link a questa pagina per raccogliere più voti sulla tua richiesta.
+        </p>
+        <form id="feedbackForm" novalidate aria-label="Modulo feedback reptiDON">
+            <fieldset class="mb-3">
+                <legend class="form-label fw-semibold small">Tipo di feedback</legend>
+                <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoFeedback"
+                               id="fbCritica" value="critica" checked>
+                        <label class="form-check-label small" for="fbCritica">Critica</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoFeedback"
+                               id="fbSuggerimento" value="suggerimento">
+                        <label class="form-check-label small" for="fbSuggerimento">Suggerimento</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="tipoFeedback"
+                               id="fbSpecie" value="specie">
+                        <label class="form-check-label small" for="fbSpecie">
+                            Richiesta nuova specie
+                        </label>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="mb-3">
+                <label for="fbTesto" class="form-label fw-semibold small">Messaggio</label>
+                <textarea class="form-control bg-dark text-light border-secondary"
+                          id="fbTesto" rows="4"
+                          placeholder="Scrivi qui il tuo feedback..."
+                          required minlength="10"></textarea>
+                <div class="invalid-feedback">Scrivi almeno 10 caratteri.</div>
+            </div>
+            <div class="mb-3">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           id="fbFirma" aria-controls="firmaField">
+                    <label class="form-check-label small" for="fbFirma">
+                        Firma con il tuo nome (facoltativo — default: anonimo)
+                    </label>
+                </div>
+                <div id="firmaField" class="mt-2 d-none">
+                    <label for="fbNome" class="form-label small">Nome o nickname</label>
+                    <input type="text"
+                           class="form-control form-control-sm bg-dark text-light border-secondary"
+                           id="fbNome"
+                           placeholder="Come vuoi essere citato"
+                           autocomplete="nickname"
+                           maxlength="50">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary">
+                <i class="bi bi-send me-2" aria-hidden="true"></i>Invia feedback
+            </button>
+        </form>
+    </section>
+
+    <section id="newsletter" class="mb-5 text-center p-4 bg-body-tertiary rounded border"
+             aria-labelledby="nl-title">
+        <h3 id="nl-title" class="h5">Scienza e aggiornamenti gratuiti</h3>
+        <form class="row justify-content-center mt-3 g-2"
+              id="newsletterForm"
+              aria-label="Iscrizione newsletter reptiDON">
+            <div class="col-auto">
+                <label for="nlEmail" class="visually-hidden">Indirizzo email</label>
+                <input type="email" class="form-control" id="nlEmail"
+                       placeholder="Indirizzo email"
+                       autocomplete="email" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-secondary">Iscriviti</button>
+            </div>
+        </form>
+        <p class="mt-2 small fw-semibold text-success">
+            <i class="bi bi-shield-check me-1" aria-hidden="true"></i>
+            Zero spam. Dati protetti. Cancellazione con un click.
+        </p>
+    </section>
+</main>
+
+<footer class="bg-black text-center p-4 mt-auto border-top" role="contentinfo">
+    <p class="mb-0 small text-white-50">
+        &copy; 2026 reptiDON. Tutti i diritti riservati.<br>
+        <a href="#" class="text-white-50">Privacy Policy</a> |
+        <a href="#" class="text-white-50">Cookie Policy</a>
+    </p>
+</footer>
+
+<!-- MODALE PREMIO -->
+<div class="modal fade" id="premioModal" tabindex="-1"
+     role="dialog" aria-modal="true"
+     aria-labelledby="premioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" id="premioModalLabel">
+                    <i class="bi bi-gift me-2" aria-hidden="true"></i>Il tuo premio di registrazione
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-4">Registrati per sbloccare un contenuto esclusivo a scelta:</p>
+                <div class="row g-3 justify-content-center mb-4">
+                    <div class="col-sm-auto">
+                        <div class="d-flex align-items-center gap-2 bg-body-secondary rounded p-2 px-3">
+                            <i class="bi bi-file-earmark-pdf-fill text-danger fs-5" aria-hidden="true"></i>
+                            <span class="small"><strong>Guida PDF estesa</strong></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-auto">
+                        <div class="d-flex align-items-center gap-2 bg-body-secondary rounded p-2 px-3">
+                            <i class="bi bi-card-checklist text-success fs-5" aria-hidden="true"></i>
+                            <span class="small"><strong>Quick-Card specie</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-success btn-lg"
+                            id="premioSbloccaBtn"
+                            aria-label="Sblocca gratuitamente il tuo premio registrandoti">
+                        <i class="bi bi-unlock me-2" aria-hidden="true"></i>Sblocca gratuitamente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE REGISTRAZIONE -->
+<div class="modal fade" id="registrationModal" tabindex="-1"
+     role="dialog" aria-modal="true"
+     aria-labelledby="regModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" id="regModalLabel">Accedi a reptiDON</h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">
+                    Registrati per il tuo premio gratuito e per accedere alle funzionalità avanzate.
+                </p>
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-light fw-bold d-flex align-items-center justify-content-center gap-2"
+                            type="button">
+                        <i class="bi bi-google fs-5" aria-hidden="true"></i>
+                        Continua con Google
+                    </button>
+                    <button class="btn btn-dark border-secondary fw-bold d-flex align-items-center justify-content-center gap-2"
+                            type="button">
+                        <i class="bi bi-apple fs-5" aria-hidden="true"></i>
+                        Continua con Apple
+                    </button>
+                    <button class="btn btn-primary fw-bold d-flex align-items-center justify-content-center gap-2"
+                            type="button">
+                        <i class="bi bi-microsoft fs-5" aria-hidden="true"></i>
+                        Continua con Outlook
+                    </button>
+                </div>
+                <div class="d-flex align-items-center my-3">
+                    <hr class="flex-grow-1 border-secondary">
+                    <span class="mx-3 text-muted small">oppure via email</span>
+                    <hr class="flex-grow-1 border-secondary">
+                </div>
+                <form id="regForm" novalidate>
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label small">Email</label>
+                        <input type="email"
+                               class="form-control bg-dark text-light border-secondary"
+                               id="regEmail"
+                               placeholder="la-tua@email.it"
+                               autocomplete="email"
+                               required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regPassword" class="form-label small">Password</label>
+                        <input type="password"
+                               class="form-control bg-dark text-light border-secondary"
+                               id="regPassword"
+                               minlength="8"
+                               autocomplete="current-password"
+                               required>
+                    </div>
+                    <div id="rD-reg-error" class="alert alert-danger py-2 small d-none" role="alert"></div>
+                    <button type="submit" class="btn btn-success w-100">Registrati</button>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary justify-content-center">
+                <small class="text-muted">
+                    Continuando, accetti la nostra
+                    <a href="#" class="text-muted">Privacy Policy</a>.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALE ACCOUNT -->
+<div class="modal fade" id="accountModal" tabindex="-1"
+     role="dialog" aria-modal="true"
+     aria-labelledby="accountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" id="accountModalLabel">
+                    <i class="bi bi-person-circle me-2" aria-hidden="true"></i>Il mio account
+                </h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-4">
+                    <p class="text-muted small text-uppercase fw-semibold mb-3">
+                        Informazioni
+                        <span id="rD-premio-badge" class="badge bg-secondary ms-2">Premio disponibile</span>
+                    </p>
+                    <div class="mb-3">
+                        <label for="accNome" class="form-label small">Nome o nickname</label>
+                        <input type="text"
+                               class="form-control bg-dark text-light border-secondary"
+                               id="accNome" placeholder="Il tuo nome"
+                               autocomplete="nickname">
+                    </div>
+                    <div class="mb-3">
+                        <label for="accEmail" class="form-label small">Email</label>
+                        <input type="email"
+                               class="form-control bg-dark text-light border-secondary"
+                               id="accEmail" placeholder="—"
+                               autocomplete="email" readonly>
+                        <div class="form-text text-muted small">
+                            Modificabile tramite il provider di autenticazione.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <p class="text-muted small text-uppercase fw-semibold mb-3">Preferenze</p>
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox"
+                               id="accNewsletter" checked>
+                        <label class="form-check-label small" for="accNewsletter">
+                            Aggiornamenti scientifici via email
+                        </label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="accNotifiche">
+                        <label class="form-check-label small" for="accNotifiche">
+                            Notifica quando viene aggiunta una nuova specie
+                        </label>
+                    </div>
+                </div>
+                <div class="bg-body-secondary rounded p-3 border border-secondary border-opacity-50">
+                    <p class="small text-muted mb-2">
+                        <i class="bi bi-lock me-1" aria-hidden="true"></i>
+                        <strong>Disponibile nelle prossime versioni</strong>
+                    </p>
+                    <ul class="list-unstyled small text-muted mb-0">
+                        <li><i class="bi bi-dash me-1" aria-hidden="true"></i>Abbonamento Premium</li>
+                        <li><i class="bi bi-dash me-1" aria-hidden="true"></i>Mockup 3D personali</li>
+                        <li><i class="bi bi-dash me-1" aria-hidden="true"></i>Storico richieste specie</li>
+                        <li><i class="bi bi-dash me-1" aria-hidden="true"></i>Download guide PDF</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary justify-content-between">
+                <button type="button" class="btn btn-sm btn-outline-danger" id="accDisconnetti">
+                    <i class="bi bi-box-arrow-right me-1" aria-hidden="true"></i>Disconnetti
+                </button>
+                <button type="button" class="btn btn-success btn-sm" id="accSalva">
+                    <i class="bi bi-check2 me-1" aria-hidden="true"></i>Salva modifiche
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ── SPLASH SCREEN ── */
+(function () {
+    var splash = document.getElementById('rD-splash');
+    if (!splash) return;
+        try { if (sessionStorage.getItem('rD-splash-done')) { splash.style.display = 'none'; return; } } catch(e) {}
+
+    var glow    = document.getElementById('rD-splash-glow');
+    var snake   = document.getElementById('rD-splash-snake');
+    var logo    = document.getElementById('rD-splash-logo');
+    var tagline = document.getElementById('rD-splash-tagline');
+    var bar     = document.getElementById('rD-splash-bar');
+    var skip    = document.getElementById('rD-splash-skip');
+
+    function splashDone() {
+        splash.classList.add('rD-splash-out');
+        sessionStorage.setItem('rD-splash-done', '1');
+        setTimeout(function () { splash.style.display = 'none'; }, 700);
+    }
+    splash.addEventListener('click', splashDone);
+
+    setTimeout(function () {
+        glow.style.transform = 'scale(1)';
+        snake.style.opacity = '1';
+        snake.style.transform = 'translateY(0)';
+        bar.style.width = '22%';
+    }, 180);
+    setTimeout(function () {
+        logo.style.opacity = '1';
+        logo.style.transform = 'translateY(0)';
+        bar.style.width = '58%';
+    }, 900);
+    setTimeout(function () {
+        tagline.style.opacity = '1';
+        tagline.style.transform = 'translateY(0)';
+        skip.style.opacity = '0.28';
+        bar.style.width = '100%';
+    }, 1650);
+        setTimeout(splashDone, 3500);
+}());
+
+
+/* ── PRISMA RING HOME BUTTON (rAF) ── */
+(function () {
+    var homeBtn = document.getElementById('rD-nav-home');
+    var sbHome  = document.getElementById('rD-sb-home');
+    var angle   = 0;
+
+        var styleEl = document.createElement('style');
+    styleEl.id = 'rD-prisma-style';
+    document.head.appendChild(styleEl);
+
+    function updatePrisma() {
+        if (document.hidden) { rafId = requestAnimationFrame(updatePrisma); return; }
+        var isActive = homeBtn && homeBtn.classList.contains('active');
+        angle = (angle + (isActive ? 2.0 : 0.55)) % 360;
+        var grad = 'conic-gradient(from ' + angle + 'deg,' +
+            'rgba(255,0,51,0.6),rgba(255,106,0,0.6),rgba(255,224,0,0.6),' +
+            'rgba(0,255,136,0.6),rgba(0,195,255,0.6),rgba(155,0,255,0.6),' +
+            'rgba(255,0,51,0.6))';
+        styleEl.textContent =
+            '#rD-nav-home::before, #rD-sb-home::before { background: ' + grad + ' !important; }';
+        rafId = requestAnimationFrame(updatePrisma);
+    }
+    var rafId = requestAnimationFrame(updatePrisma);
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) rafId = requestAnimationFrame(updatePrisma);
+    });
+}());
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ══════════════════════════════════════════
+       rD-AUTH — Simulazione account localStorage
+       Credenziali demo:
+         demo@reptidon.dev / reptidon2024
+    ══════════════════════════════════════════ */
+    var RD_AUTH_KEY = 'rD-auth';
+    var RD_DEMO_CREDENTIALS = [
+        { email: 'demo@reptidon.dev', password: 'reptidon2024', nome: 'Thomas' }
+    ];
+
+    /* ── Utils localStorage Safari-safe ── */
+    function rdAuthGet() {
+        try {
+            var raw = localStorage.getItem(RD_AUTH_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+    }
+    function rdAuthSet(data) {
+        try { localStorage.setItem(RD_AUTH_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+    function rdAuthClear() {
+        try { localStorage.removeItem(RD_AUTH_KEY); } catch (e) {}
+    }
+
+    /* ── Aggiorna navbar in base allo stato auth ── */
+    function rdRenderNav(auth) {
+        var profileBtn   = document.getElementById('rD-nav-profile');
+        var profileIcon  = document.getElementById('rD-nav-profile-icon');
+        var profileLabel = document.getElementById('rD-nav-profile-label');
+        var sbProfileBtn = document.getElementById('rD-sb-profile');
+        var sbProfileIcon = document.getElementById('rD-sb-profile-icon');
+
+        if (auth && auth.loggedIn) {
+            /* Stato loggato */
+            var nomeBreve = auth.nome.split(' ')[0];
+            if (profileBtn) {
+                profileBtn.setAttribute('data-bs-target', '#accountModal');
+                profileBtn.setAttribute('aria-label', 'Account di ' + auth.nome);
+                profileBtn.classList.add('active');
+            }
+            if (profileIcon) {
+                profileIcon.className = 'bi bi-person-fill';
+                profileIcon.style.fontSize = '1.18rem';
+            }
+            if (profileLabel) profileLabel.textContent = nomeBreve;
+            if (sbProfileBtn) {
+                sbProfileBtn.setAttribute('data-bs-target', '#accountModal');
+                sbProfileBtn.setAttribute('aria-label', 'Account di ' + auth.nome);
+            }
+            if (sbProfileIcon) sbProfileIcon.className = 'bi bi-person-fill';
+
+            /* Pre-compila accountModal */
+            var accNome  = document.getElementById('accNome');
+            var accEmail = document.getElementById('accEmail');
+            if (accNome)  accNome.value  = auth.nome;
+            if (accEmail) accEmail.value = auth.email;
+
+        } else {
+            /* Stato anonimo */
+            if (profileBtn) {
+                profileBtn.setAttribute('data-bs-target', '#registrationModal');
+                profileBtn.setAttribute('aria-label', 'Accedi o registrati');
+                profileBtn.classList.remove('active');
+            }
+            if (profileIcon) {
+                profileIcon.className = 'bi bi-person-circle';
+                profileIcon.style.fontSize = '1.18rem';
+            }
+            if (profileLabel) profileLabel.textContent = 'Accedi';
+            if (sbProfileBtn) {
+                sbProfileBtn.setAttribute('data-bs-target', '#registrationModal');
+                sbProfileBtn.setAttribute('aria-label', 'Accedi o registrati');
+            }
+            if (sbProfileIcon) sbProfileIcon.className = 'bi bi-person-circle';
+        }
+    }
+
+    /* ── Aggiorna stato premio nell'accountModal ── */
+    function rdRenderPremio(auth) {
+        var prBadge = document.getElementById('rD-premio-badge');
+        if (!prBadge) return;
+        if (auth && auth.premioRichiesto) {
+            prBadge.textContent = 'Premio riscattato';
+            prBadge.className = 'badge bg-success ms-2';
+        } else {
+            prBadge.textContent = 'Premio disponibile';
+            prBadge.className = 'badge bg-secondary ms-2';
+        }
+    }
+
+    /* ── Init: legge stato da localStorage ── */
+    var rdAuth = rdAuthGet();
+    rdRenderNav(rdAuth);
+    rdRenderPremio(rdAuth);
+
+    /* ── LOGIN via regForm ── */
+    var regForm = document.getElementById('regForm');
+    var regEmailEl = document.getElementById('regEmail');
+    var regPwEl    = document.getElementById('regPassword');
+    var regError   = document.getElementById('rD-reg-error');
+
+    if (regForm) {
+        regForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = regEmailEl ? regEmailEl.value.trim().toLowerCase() : '';
+            var pw    = regPwEl    ? regPwEl.value : '';
+            var match = null;
+
+            for (var i = 0; i < RD_DEMO_CREDENTIALS.length; i++) {
+                if (RD_DEMO_CREDENTIALS[i].email === email &&
+                    RD_DEMO_CREDENTIALS[i].password === pw) {
+                    match = RD_DEMO_CREDENTIALS[i];
+                    break;
+                }
+            }
+
+            if (match) {
+                /* Login riuscito */
+                rdAuth = { loggedIn: true, nome: match.nome, email: match.email, premioRichiesto: false };
+                rdAuthSet(rdAuth);
+                rdRenderNav(rdAuth);
+                rdRenderPremio(rdAuth);
+
+                /* Chiudi registrationModal */
+                var regModalEl = document.getElementById('registrationModal');
+                var regModalInst = bootstrap.Modal.getInstance(regModalEl);
+                if (regModalInst) regModalInst.hide();
+
+                /* Reset form e pulizia errori */
+                regForm.reset();
+                regForm.classList.remove('was-validated');
+                if (regError) regError.classList.add('d-none');
+
+            } else {
+                /* Credenziali errate — errore inline, nessun alert */
+                if (regError) {
+                    regError.textContent = 'Email o password errati. Riprova.';
+                    regError.classList.remove('d-none');
+                }
+                if (regPwEl) { regPwEl.value = ''; regPwEl.focus(); }
+            }
+        });
+
+        /* Nascondi errore quando l'utente riprende a scrivere */
+        if (regEmailEl) regEmailEl.addEventListener('input', function () {
+            if (regError) regError.classList.add('d-none');
+        });
+        if (regPwEl) regPwEl.addEventListener('input', function () {
+            if (regError) regError.classList.add('d-none');
+        });
+    }
+
+    /* ── LOGOUT ── */
+    var accDisconnetti = document.getElementById('accDisconnetti');
+    if (accDisconnetti) {
+        accDisconnetti.addEventListener('click', function () {
+            rdAuthClear();
+            rdAuth = null;
+            rdRenderNav(null);
+            rdRenderPremio(null);
+
+            /* Chiudi accountModal */
+            var accModalEl   = document.getElementById('accountModal');
+            var accModalInst = bootstrap.Modal.getInstance(accModalEl);
+            if (accModalInst) accModalInst.hide();
+        });
+    }
+
+    /* ── SALVA MODIFICHE account ── */
+    var accSalva = document.getElementById('accSalva');
+    if (accSalva) {
+        accSalva.addEventListener('click', function () {
+            var accNome = document.getElementById('accNome');
+            if (!accNome || !accNome.value.trim()) return;
+            rdAuth = rdAuthGet();
+            if (rdAuth) {
+                rdAuth.nome = accNome.value.trim();
+                rdAuthSet(rdAuth);
+                rdRenderNav(rdAuth);
+            }
+            var accModalEl   = document.getElementById('accountModal');
+            var accModalInst = bootstrap.Modal.getInstance(accModalEl);
+            if (accModalInst) accModalInst.hide();
+        });
+    }
+
+    /* ── Pre-compila accountModal ogni volta che si apre ── */
+    var accountModalEl = document.getElementById('accountModal');
+    if (accountModalEl) {
+        accountModalEl.addEventListener('show.bs.modal', function () {
+            var current = rdAuthGet();
+            var accNome  = document.getElementById('accNome');
+            var accEmail = document.getElementById('accEmail');
+            if (current) {
+                if (accNome)  accNome.value  = current.nome;
+                if (accEmail) accEmail.value = current.email;
+            }
+            rdRenderPremio(current);
+        });
+    }
+
+    /* ── PREMIO: sblocca (loggato) o redirect a login ── */
+    var premioBtn = document.getElementById('premioSbloccaBtn');
+    if (premioBtn) {
+        premioBtn.addEventListener('click', function () {
+            var current = rdAuthGet();
+            if (current && current.loggedIn) {
+                /* Loggato: segna premio come riscattato */
+                current.premioRichiesto = true;
+                rdAuthSet(current);
+                rdAuth = current;
+                rdRenderPremio(current);
+                var premioModalEl   = document.getElementById('premioModal');
+                var premioModalInst = bootstrap.Modal.getInstance(premioModalEl);
+                if (premioModalInst) premioModalInst.hide();
+            } else {
+                /* Non loggato: chiudi premioModal, apri registrationModal */
+                var premioModalEl2 = document.getElementById('premioModal');
+                var premioModalInst2 = bootstrap.Modal.getInstance(premioModalEl2);
+                if (premioModalInst2) premioModalInst2.hide();
+                premioModalEl2.addEventListener('hidden.bs.modal', function handler() {
+                    var regModal = new bootstrap.Modal(document.getElementById('registrationModal'));
+                    regModal.show();
+                    premioModalEl2.removeEventListener('hidden.bs.modal', handler);
+                });
+            }
+        });
+    }
+
+    /* ── FORM HANDLERS ESISTENTI (invariati) ── */
+    var fbFirma = document.getElementById('fbFirma');
+    var firmaField = document.getElementById('firmaField');
+    if (fbFirma && firmaField) {
+        fbFirma.addEventListener('change', function () {
+            firmaField.classList.toggle('d-none', !this.checked);
+            var fbNome = document.getElementById('fbNome');
+            if (fbNome) fbNome.required = this.checked;
+        });
+    }
+
+    var feedbackForm = document.getElementById('feedbackForm');
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!this.checkValidity()) {
+                this.classList.add('was-validated');
+                return;
+            }
+            alert('Feedback inviato. Grazie per il contributo alla community reptiDON.');
+            this.reset();
+            this.classList.remove('was-validated');
+            if (firmaField) firmaField.classList.add('d-none');
+        });
+    }
+
+    var nlForm = document.getElementById('newsletterForm');
+    if (nlForm) {
+        nlForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert('Newsletter: funzionalità in arrivo nella prossima release.');
+        });
+    }
+
+});
+</script>
+</body>
+</html>

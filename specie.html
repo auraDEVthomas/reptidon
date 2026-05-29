@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="it" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reptiDON — Guide alle Specie</title>
+    <meta name="description" content="Guide complete alla cura di rettili e aracnidi: costi reali, difficoltà, parametri verificati per ogni specie.">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+    /* ── BASE ── */
+    body {
+        padding-top: 0;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+    img { height: auto; }
+    .badge-xs { font-size: 0.6rem; }
+    .card-specie-hidden { display: none !important; }
+
+    body.mode-lettura main { max-width: 740px; margin-inline: auto; font-size: 1.1rem; line-height: 1.85; }
+    body.mode-focus .ads-banner,
+    body.mode-focus .section-premio { display: none !important; }
+    #btnLettura.active,
+    #btnFocus.active { background-color: var(--bs-secondary) !important; color: #fff !important; border-color: var(--bs-secondary) !important; }
+
+    /* ── SPLASH SCREEN ── */
+    #rD-splash {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #020602;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 14px;
+        transition: opacity 0.65s ease; cursor: pointer;
+    }
+    #rD-splash.rD-splash-out { opacity: 0; pointer-events: none; }
+    #rD-splash-glow {
+        position: absolute; width: 320px; height: 320px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(74,222,128,0.11) 0%, transparent 65%);
+        filter: blur(50px);
+        transform: scale(0.15);
+        transition: transform 1.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    #rD-splash-snake { opacity: 0; transform: translateY(32px); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1) 0.05s, transform 0.85s cubic-bezier(0.16,1,0.3,1) 0.05s; }
+    #rD-splash-logo { font-family: Georgia, serif; font-size: clamp(2rem,9vw,2.6rem); font-weight: 700; letter-spacing: -0.02em; color: #f0fdf4; line-height: 1; opacity: 0; transform: translateY(14px); transition: opacity 0.65s cubic-bezier(0.16,1,0.3,1), transform 0.65s cubic-bezier(0.16,1,0.3,1); }
+    #rD-splash-logo span { color: #4ade80; }
+    #rD-splash-tagline { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.35); font-family: monospace; text-align: center; opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    #rD-splash-bar { position: absolute; bottom: 0; left: 0; height: 2px; background: linear-gradient(90deg,#4ade80,#22d3ee); box-shadow: 0 0 8px #4ade80; width: 0%; transition: width 0.85s cubic-bezier(0.4,0,0.2,1); }
+    #rD-splash-skip { position: absolute; bottom: 20px; font-size: 0.62rem; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; opacity: 0; transition: opacity 0.4s ease 0.2s; }
+
+    /* ── BOTTOM NAVBAR ── */
+    #rD-navbar { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); width: calc(100% - 20px); max-width: 440px; z-index: 1000; }
+    #rD-navbar-inner { display: flex; align-items: center; justify-content: space-around; padding: 10px 6px; background: rgba(8,14,8,0.92); backdrop-filter: blur(28px) saturate(1.9); -webkit-backdrop-filter: blur(28px) saturate(1.9); border-radius: 26px; border: 1px solid rgba(74,222,128,0.16); box-shadow: 0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05); }
+    .rD-nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; background: transparent; border: none; width: 44px; min-height: 50px; border-radius: 12px; padding: 0; color: rgba(255,255,255,0.5); cursor: pointer; flex-shrink: 0; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.3s ease; -webkit-tap-highlight-color: transparent; text-decoration: none; }
+    .rD-nav-item:disabled, .rD-nav-item[aria-disabled="true"] { color: rgba(255,255,255,0.2); cursor: not-allowed; pointer-events: none; }
+    .rD-nav-item:active { transform: scale(0.88); }
+    .rD-nav-item .rD-nav-label { font-size: 0.52rem; letter-spacing: 0.04em; line-height: 1; }
+    .rD-nav-item.active { color: #22d3ee; }
+    .rD-nav-item.active .rD-nav-label { font-weight: 600; }
+    #rD-nav-home { position: relative; width: 52px; height: 52px; border-radius: 50%; border: none; background: radial-gradient(circle at 32% 32%,#1c2e1c,#090e09); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 4px 14px rgba(0,0,0,0.4); cursor: pointer; flex-shrink: 0; color: rgba(255,255,255,0.65); -webkit-tap-highlight-color: transparent; text-decoration: none; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), color 0.3s ease, box-shadow 0.3s ease; }
+    #rD-nav-home:active { transform: scale(0.88); }
+    #rD-nav-home.active { color: #4ade80; box-shadow: 0 0 0 1px rgba(74,222,128,0.25), 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06); }
+    #rD-nav-home::before { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: conic-gradient(from 0deg, rgba(255,0,51,0.6),rgba(255,106,0,0.6),rgba(255,224,0,0.6),rgba(0,255,136,0.6),rgba(0,195,255,0.6),rgba(155,0,255,0.6),rgba(255,0,51,0.6)); -webkit-mask: radial-gradient(circle, transparent 23px, black 24px); mask: radial-gradient(circle, transparent 23px, black 24px); opacity: 0.5; transition: opacity 0.4s ease; }
+    #rD-nav-home.active::before { opacity: 1; }
+    .rD-nav-presto { position: absolute; top: 2px; right: 2px; font-size: 0.4rem; background: rgba(251,191,36,0.18); color: #fbbf24; border-radius: 99px; padding: 1px 4px; letter-spacing: 0.03em; pointer-events: none; }
+
+    /* Landscape */
+    @media (orientation: landscape) and (max-height: 500px) {
+        #rD-navbar { display: none; }
+        #rD-sidebar { display: flex; }
+        body { padding-bottom: 0; padding-left: calc(64px + env(safe-area-inset-left, 0px)); }
+    }
+    @media not ((orientation: landscape) and (max-height: 500px)) {
+        #rD-sidebar { display: none; }
+    }
+
+    /* ── SIDEBAR LANDSCAPE ── */
+    #rD-sidebar { position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 1000; flex-direction: column; align-items: center; padding: 10px 5px; gap: 3px; background: rgba(8,14,8,0.92); backdrop-filter: blur(28px) saturate(1.9); -webkit-backdrop-filter: blur(28px) saturate(1.9); border-radius: 22px; border: 1px solid rgba(74,222,128,0.16); box-shadow: 0 8px 32px rgba(0,0,0,0.55); min-width: 48px; }
+    #rD-sidebar .rD-sb-logo { font-size: 0.6rem; font-weight: 800; color: #4ade80; font-family: Georgia, serif; letter-spacing: 0.04em; margin-bottom: 6px; }
+    #rD-sidebar .rD-sb-divider { width: 18px; height: 1px; background: rgba(74,222,128,0.16); margin-bottom: 2px; }
+    .rD-sb-btn { width: 40px; height: 40px; border-radius: 13px; border: 1px solid transparent; background: transparent; color: rgba(255,255,255,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+    .rD-sb-btn.active { background: rgba(34,211,238,0.14); border-color: rgba(34,211,238,0.2); color: #22d3ee; }
+    #rD-sb-home { position: relative; width: 40px; height: 40px; border-radius: 50%; border: none; background: radial-gradient(circle at 32% 32%,#1c2e1c,#090e09); color: rgba(255,255,255,0.6); cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 3px 0; -webkit-tap-highlight-color: transparent; text-decoration: none; transition: color 0.3s ease; }
+    #rD-sb-home.active { color: #4ade80; }
+    #rD-sb-home::before { content: ''; position: absolute; inset: -3px; border-radius: 50%; background: conic-gradient(from 0deg,rgba(255,0,51,0.6),rgba(255,106,0,0.6),rgba(255,224,0,0.6),rgba(0,255,136,0.6),rgba(0,195,255,0.6),rgba(155,0,255,0.6),rgba(255,0,51,0.6)); -webkit-mask: radial-gradient(circle, transparent 17px, black 18px); mask: radial-gradient(circle, transparent 17px, black 18px); opacity: 0.45; transition: opacity 0.4s ease; }
+    #rD-sb-home.active::before { opacity: 1; }
+    </style>
+</head>
+<body>
+
+<!-- ── SPLASH SCREEN ── -->
+<div id="rD-splash" role="dialog" aria-label="Schermata di benvenuto reptiDON" aria-modal="true">
+    <div id="rD-splash-glow" aria-hidden="true"></div>
+    <div id="rD-splash-snake" aria-hidden="true">
+        <svg width="68" height="68" viewBox="0 0 68 68" fill="none" aria-hidden="true">
+            <path d="M17 54 C17 37, 8 27, 17 17 C26 7, 46 12, 50 23 C54 34, 44 43, 34 38 C24 33, 22 22, 33 19"
+                  stroke="#4ade80" stroke-width="5" stroke-linecap="round"/>
+            <ellipse cx="33" cy="19" rx="4.5" ry="3.2" fill="#4ade80"/>
+            <circle cx="31.2" cy="17.8" r="1.2" fill="#020602"/>
+            <circle cx="35" cy="17.8" r="1.2" fill="#020602"/>
+            <path d="M32 21 L31 24 M34.5 21 L35.5 24" stroke="#020602" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div id="rD-splash-logo">repti<span>DON</span></div>
+    <div id="rD-splash-tagline">Scienza &middot; Terraristica &middot; Dati Reali</div>
+    <div id="rD-splash-bar" aria-hidden="true"></div>
+    <div id="rD-splash-skip" aria-hidden="true">tocca per saltare</div>
+</div>
+
+<!-- ── BOTTOM NAVBAR ── -->
+<nav id="rD-navbar" aria-label="Navigazione principale">
+    <div id="rD-navbar-inner">
+
+        <a href="specie_v4.1.html"
+           class="rD-nav-item active"
+           id="rD-nav-species"
+           aria-label="Guide alle specie"
+           aria-current="page">
+            <i class="bi bi-journal-text" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">Specie</span>
+        </a>
+
+        <button class="rD-nav-item"
+                id="rD-nav-profile"
+                aria-label="Accedi o registrati"
+                data-bs-toggle="modal"
+                data-bs-target="#registrationModal">
+            <i id="rD-nav-profile-icon" class="bi bi-person-circle" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label" id="rD-nav-profile-label">Accedi</span>
+        </button>
+
+        <a href="index_v4.1.html"
+           id="rD-nav-home"
+           aria-label="Home reptiDON">
+            <i class="bi bi-house-fill" style="font-size:1.3rem;" aria-hidden="true"></i>
+        </a>
+
+        <button class="rD-nav-item"
+                aria-disabled="true"
+                aria-label="Mockup 3D — disponibile a breve"
+                style="position:relative;">
+            <i class="bi bi-box-fill" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">3D</span>
+            <span class="rD-nav-presto" aria-hidden="true">presto</span>
+        </button>
+
+        <a href="index_v4.1.html#feedback"
+           class="rD-nav-item"
+           id="rD-nav-feedback"
+           aria-label="Feedback community">
+            <i class="bi bi-chat-quote" style="font-size:1.18rem;" aria-hidden="true"></i>
+            <span class="rD-nav-label">Feedback</span>
+        </a>
+
+    </div>
+</nav>
+
+<!-- ── SIDEBAR LANDSCAPE ── -->
+<nav id="rD-sidebar" aria-label="Navigazione principale">
+    <span class="rD-sb-logo" aria-hidden="true">rD</span>
+    <div class="rD-sb-divider" aria-hidden="true"></div>
+
+    <a href="specie_v4.1.html" class="rD-sb-btn active" aria-label="Guide alle specie" aria-current="page">
+        <i class="bi bi-journal-text" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </a>
+    <button class="rD-sb-btn"
+            id="rD-sb-profile"
+            aria-label="Accedi o registrati"
+            data-bs-toggle="modal"
+            data-bs-target="#registrationModal">
+        <i id="rD-sb-profile-icon" class="bi bi-person-circle" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </button>
+    <a href="index_v4.1.html" id="rD-sb-home" aria-label="Home reptiDON">
+        <i class="bi bi-house-fill" style="font-size:1rem;" aria-hidden="true"></i>
+    </a>
+    <button class="rD-sb-btn" aria-disabled="true" aria-label="Mockup 3D — disponibile a breve" style="color:rgba(255,255,255,0.2);cursor:not-allowed;">
+        <i class="bi bi-box-fill" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </button>
+    <a href="index_v4.1.html#feedback" class="rD-sb-btn" aria-label="Feedback">
+        <i class="bi bi-chat-quote" style="font-size:1.05rem;" aria-hidden="true"></i>
+    </a>
+</nav>
+
+
+<!-- ===== HEADER PAGINA ===== -->
+<header class="container mt-4 mb-2" role="banner">
+    <h1 class="h3 fw-bold border-bottom pb-3">Guide alle specie</h1>
+    <p class="text-muted mt-2 mb-4">
+        Ogni scheda riporta parametri verificati, costi reali e aggiornamenti di natura
+        esclusivamente scientifica, biologica e gestionale.
+        Le modifiche al sito sono relegate alla sezione <strong>News</strong> (in arrivo).
+    </p>
+    <nav class="d-flex flex-wrap gap-2 mb-4" aria-label="Scorciatoie sezioni">
+        <a href="#allevati" class="btn btn-sm btn-outline-success">Allevati da noi</a>
+        <a href="#detenuti" class="btn btn-sm btn-outline-secondary">Detenuti da noi</a>
+       </nav>
+
+    <!-- FILTRI RICERCA -->
+    <div class="mb-4" id="filtriSpecie">
+        <input type="search" class="form-control mb-3"
+               id="cercaSpecie"
+               placeholder="Cerca per nome..."
+               aria-label="Cerca specie">
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <small class="text-muted w-100">Gruppo</small>
+            <button type="button" class="btn btn-sm btn-secondary active" data-filtro-gruppo="tutti">Tutti</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-gruppo="serpenti">Serpenti</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-gruppo="gechi">Gechi</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-gruppo="aracnidi">Aracnidi</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-gruppo="pesci">Pesci</button>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <small class="text-muted w-100">Biotopo principale</small>
+            <button type="button" class="btn btn-sm btn-secondary active" data-filtro-biotopo="tutti">Tutti</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-biotopo="temperato">Temperato</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-biotopo="secco">Secco</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-biotopo="tropicale">Tropicale</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-biotopo="umido">Umido</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-filtro-biotopo="opportunista">Opportunista</button>
+        </div>
+    </div>
+</header>
+
+
+<!-- ===== MAIN ===== -->
+<main class="container">
+
+    <!-- SEZIONE ALLEVATI DA NOI -->
+    <section id="allevati" class="mb-5" aria-labelledby="allevati-title">
+
+        <h2 id="allevati-title" class="border-bottom pb-2">
+            <i class="bi bi-heart-fill text-success me-2" aria-hidden="true"></i>Allevati da noi
+        </h2>
+        <p class="text-muted mt-2 mb-4 small">
+            Specie per le quali gestiamo un progetto riproduttivo attivo o una colonia.
+            <strong>Unici esemplari attualmente in coabitazione:</strong>
+            <em>Eublepharis macularius</em> (trio) e <em>Lepidodactylus lugubris</em> (colonia).
+            Tutte le altre specie sono a <strong>stabulazione individuale</strong>
+            anche quando presenti in più esemplari.
+        </p>
+
+        <div class="row g-4">
+
+            <!-- A-1: Bull Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="pit-catenifer" data-gruppo="serpenti" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Bull Snake<br>
+                            <em class="fs-6 text-muted">Pituophis catenifer sayi</em>
+                        </h3>
+                        <span class="badge bg-info text-dark mb-2">1 maschio + 1 femmina — stabulazione individuale</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media-Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~280€ setup (terrario 120x60x60 cm, termostato, substrato sabbioso). ~180€/anno (70€ cibo, 60€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~60€ (ancestrale CB) a diverse centinaia per morph.
+                                Dipende da genetica, sesso, CB/WC e allevatore.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Verificato ciclo di muta e frequenza pasti per adulti</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-2: Northern Pine Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="pit-melanoleucus" data-gruppo="serpenti" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Northern Pine Snake<br>
+                            <em class="fs-6 text-muted">Pituophis melanoleucus melanoleucus</em>
+                        </h3>
+                        <span class="badge bg-info text-dark mb-2">1 maschio + 1 femmina — stabulazione individuale</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media-Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~300€ setup (terrario asciutto, ben ventilato; brumazione necessaria per indurre la riproduzione). ~185€/anno (80€ cibo, 55€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~80€ (ancestrale CB). Disponibilità limitata in Italia.
+                                Verificare certificazione CB prima dell'acquisto.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Aggiornamento parametri termici di brumazione e indicatori riproduttivi</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-3: Schrenck's Rat Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="elaphe" data-gruppo="serpenti" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Schrenck's Rat Snake<br>
+                            <em class="fs-6 text-muted">Elaphe schrenkii</em>
+                        </h3>
+                        <span class="badge bg-info text-dark mb-2">1 maschio + 1 femmina — stabulazione individuale</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media.<br>
+                            <strong>Costi reali stimati:</strong> ~260€ setup (terrario 120x60 cm; specie di clima temperato-freddo, richiede abbassamento termico invernale). ~160€/anno (60€ cibo, 50€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: ~60-100€. Non confondere con <em>Elaphe dione</em>.
+                                Tassonomia aggiornata: genere <em>Elaphe</em> confermato (non <em>Euprepiophis</em>).
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Revisione tassonomica confermata: genere Elaphe validato dalla letteratura corrente</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-4: Western Hognose Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="het-nasicus" data-gruppo="serpenti" data-biotopo="secco">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Western Hognose Snake<br>
+                            <em class="fs-6 text-muted">Heterodon nasicus</em>
+                        </h3>
+                        <span class="badge bg-info text-dark mb-2">1 maschio + 1 femmina — stabulazione individuale</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa-Media.<br>
+                            <strong>Costi reali stimati:</strong> ~180€ setup (terrario 80x40 cm, gradiente termico contenuto). ~130€/anno (40€ cibo, 40€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~80€ (ancestrale) a 400€+ per morph rari.
+                                Specie opistoglifa: saliva lievemente tossica per gli anfibi, non pericolosa
+                                in condizioni normali per l'uomo.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Aggiornamento nota saliva opistoglifa e risposta difensiva simulata (thanatosi)</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-5: Corn Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm overflow-hidden" id="pantherophis" data-gruppo="serpenti" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Corn Snake<br>
+                            <em class="fs-6 text-muted">Pantherophis guttatus</em>
+                        </h3>
+                        <span class="badge bg-info text-dark mb-2">1 maschio + 1 femmina + 1 giovane<br>stabulazione individuale</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa.<br>
+                            <strong>Costi reali stimati:</strong> ~150€ setup (terrario 90x45 cm per adulto). ~110€/anno (30€ cibo, 30€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~30€ (ancestrale) a 200€+ per morph multipli.
+                                Specie ideale per chi inizia. Longeva: fino a 20 anni in cattività con gestione corretta.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Confermata longevità media in cattività: 15-20 anni con parametri ottimali</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-6: Leopard Gecko — UNICO IN COABITAZIONE -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm border-success" id="eublepharis" data-gruppo="gechi" data-biotopo="secco">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Leopard Gecko<br>
+                            <em class="fs-6 text-muted">Eublepharis macularius</em>
+                        </h3>
+                        <span class="badge bg-success mb-2">1 maschio + 2 femmine — in coabitazione (trio)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa.<br>
+                            <strong>Costi reali stimati:</strong> ~220€ setup (terrario arido, riscaldamento ventrale, hide termici). ~200€/anno per il trio (80€ insetti, 25€ supplementi calcio+D3, 45€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~30€ (ancestrale) a oltre 500€ per morph combinati.
+                                I maschi non vanno mai tenuti insieme: combattono fino a gravi lesioni.
+                                La coabitazione maschio-femmine richiede monitoraggio costante.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Aggiornamento parametri umidità e monitoraggio comportamentale della coabitazione intraspecifica</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- A-7: Mourning Gecko — UNICO IN COABITAZIONE -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm border-success" id="lepidodactylus" data-gruppo="gechi" data-biotopo="opportunista">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Mourning Gecko<br>
+                            <em class="fs-6 text-muted">Lepidodactylus lugubris</em>
+                        </h3>
+                        <span class="badge bg-success mb-2">Colonia partenogenetica — in coabitazione</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa.<br>
+                            <strong>Costi reali stimati:</strong> ~150€ setup (terrario tropicale verticale, umidità oltre il 70%). ~150€/anno (50€ micro-insetti, 15€ supplementi, 35€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: ~5-15€ (specie comune).
+                                Si riproduce per partenogenesi obbligata: ogni uovo depositato è fertile
+                                per definizione biologica, senza la presenza di un maschio.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Confermata partenogenesi obbligata: tutte le uova fertili indipendentemente dalla densità della colonia</small>
+                    </div>
+                </article>
+            </div>
+
+        </div><!-- /row Allevati -->
+    </section>
+
+    <!-- SEZIONE DETENUTI DA NOI — 13 specie, stabulazione individuale -->
+    <section id="detenuti" class="mb-5" aria-labelledby="detenuti-title">
+
+        <h2 id="detenuti-title" class="border-bottom pb-2">
+            <i class="bi bi-collection-fill text-secondary me-2" aria-hidden="true"></i>Detenuti da noi
+        </h2>
+        <p class="text-muted mt-2 mb-4 small">
+            Esemplari singoli tenuti individualmente.
+            Giovani a sesso non ancora determinabile indicati come sling (aracnidi) o baby (rettili/pesci).
+        </p>
+
+        <div class="row g-4">
+
+            <!-- D-1: False Water Cobra -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="hydrodynastes" data-gruppo="serpenti" data-biotopo="tropicale">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            False Water Cobra<br>
+                            <em class="fs-6 text-muted">Hydrodynastes gigas</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.1 — Singolo (femmina)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~400€ setup (terrario 150x80 cm, vaschette d'acqua ampie, umidità controllata). ~230€/anno (100€ cibo, 60€ energia, 70€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 200-400€.
+                                Specie difensiva: produce un caratteristico appiattimento cervicale simile al cobra quando minacciata.
+                                Non pericolosa per l'uomo in condizioni normali.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Aggiornamento note comportamentali: risposta difensiva e parametri acquatici ottimali</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-2: Mexican Pine Snake -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="pit-deppei" data-gruppo="serpenti" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Mexican Pine Snake<br>
+                            <em class="fs-6 text-muted">Pituophis deppei jani</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">1.0 — Singolo (maschio)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media-Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~280€ setup (terrario 120x60x60 cm, substrato sabbioso asciutto, gradiente termico ampio). ~170€/anno (70€ cibo, 50€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 80-150€. Sottospecie rara nel mercato CB italiano.
+                                Verificare sempre la certificazione CB prima dell'acquisto.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura della sottospecie — parametri di base confermati</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-3: Central American Boa -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="boa-imperator" data-gruppo="serpenti" data-biotopo="tropicale">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Central American Boa<br>
+                            <em class="fs-6 text-muted">Boa imperator</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.1 — Singolo (femmina)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media.<br>
+                            <strong>Costi reali stimati:</strong> ~350€ setup (terrario 150x60 cm per adulto, termostato, gradiente termico). ~200€/anno (80€ cibo, 70€ energia, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~150€.
+                                Non confondere con <em>Boa constrictor</em> sensu stricto:
+                                tassonomia separata dal 2009. B. imperator rimane di taglia più contenuta.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Chiarimento tassonomico: Boa imperator vs Boa constrictor — separazione formale dal 2009</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-4: Crested Gecko -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="correlophus" data-gruppo="gechi" data-biotopo="tropicale">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Crested Gecko<br>
+                            <em class="fs-6 text-muted">Correlophus ciliatus</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">1.0 — Singolo (maschio)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa.<br>
+                            <strong>Costi reali stimati:</strong> ~130€ setup (terrario verticale tropicale, umidità 70-80%). ~130€/anno (50€ CGD + insetti, 15€ supplementi, 30€ energia, 35€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~40€ (ancestrale) a 300€+ per morph Lilly White/Pinstripe.
+                                Specie quasi estinta in natura, ora stabilizzata esclusivamente in cattività.
+                                Il CGD (Crested Gecko Diet) sostituisce gran parte dei pasti di insetti.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Aggiornamento stato di conservazione in natura e protocollo alimentare con CGD</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-5: Brazilian Pink Tarantula -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="vitalius" data-gruppo="aracnidi" data-biotopo="tropicale">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Brazilian Pink Tarantula<br>
+                            <em class="fs-6 text-muted">Vitalius chromatus</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.1 — Singolo (femmina)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media.<br>
+                            <strong>Costi reali stimati:</strong> ~80€ setup (terrario arboricolo con substrato umido, elevata umidità). ~100€/anno (40€ insetti, 10€ substrato, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 80-120€.
+                                Specie opportunistica: tendenza al fastidio ma raramente aggressiva.
+                                Peli urticanti presenti — uso guanti consigliato durante manutenzione.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Note sui peli urticanti e protocollo di gestione sicura durante le mute</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-6: Golden Blue-Leg Baboon -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="harpactira" data-gruppo="aracnidi" data-biotopo="secco">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Golden Blue-Leg Baboon<br>
+                            <em class="fs-6 text-muted">Harpactira pulchripes</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.1 — Singolo (femmina)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media-Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~70€ setup (terrario terrestre arido con substrato, nascondigli multipli). ~100€/anno (40€ insetti, 10€ substrato, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 50-80€.
+                                Specie Old World: veleno di potenza moderata, tendenza difensiva marcata.
+                                Non adatta a chi non ha esperienza con tarantole.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — potenza venefica relativa e comportamento difensivo documentati</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-7: Peruvian Tarantula -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="thrixopelma" data-gruppo="aracnidi" data-biotopo="secco">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Peruvian Tarantula<br>
+                            <em class="fs-6 text-muted">Thrixopelma ockertii</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.0.3 — 3 giovani (sesso n.d.)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media.<br>
+                            <strong>Costi reali stimati:</strong> ~60€ setup per slingbox (poi terrario terrestre in stadio adulto). ~90€/anno cad (35€ insetti, 5€ substrato, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 25-60€ per sling.
+                                Il sessaggio è possibile solo da esemplare adulto o tramite analisi dell'esuvio.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura giovani — sessaggio in attesa dello stadio sub-adulto</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-8: OBT Baboon Tarantula -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="pterinochilus" data-gruppo="aracnidi" data-biotopo="opportunista">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            OBT Baboon Tarantula<br>
+                            <em class="fs-6 text-muted">Pterinochilus murinus</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.0.2 — 2 giovani (sesso n.d.)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~60€ setup per slingbox. ~90€/anno cad.<br>
+                            <small class="text-muted">
+                                OBT = Old World Baboon Tarantula (acronimo comune nel settore).
+                                Specie particolarmente difensiva, veloce e imprevedibile.
+                                Veleno più potente rispetto alle tarantole del Nuovo Mondo.
+                                Non raccomandata a neofiti.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura giovani — nota temperamento difensivo e comparazione venefica OW vs NW</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-9: Mexican Fireleg Tarantula -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="brachypelma" data-gruppo="aracnidi" data-biotopo="secco">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Mexican Fireleg Tarantula<br>
+                            <em class="fs-6 text-muted">Brachypelma boehmei</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.0.1 — 1 giovane (sesso n.d.)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa-Media.<br>
+                            <strong>Costi reali stimati:</strong> ~50€ setup per slingbox. ~90€/anno.<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 30-60€ per sling.
+                                Appendice II CITES: commercio regolamentato — verificare documentazione.
+                                Tra le tarantole più longeve: le femmine possono superare i 20 anni.
+                                Peli urticanti presenti.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — nota CITES Appendice II e longevità documentata in letteratura</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-10: South American Funnel Spider -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="linothele" data-gruppo="aracnidi" data-biotopo="umido">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            South American Funnel Spider<br>
+                            <em class="fs-6 text-muted">Linothele fallax</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.0.1 — 1 giovane (sesso n.d.)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Media.<br>
+                            <strong>Costi reali stimati:</strong> ~50€ setup (terrario verticale con elevata umidità per la costruzione degli imbuti). ~90€/anno.<br>
+                            <small class="text-muted">
+                                Ragno a imbuto (famiglia Dipluridae).
+                                Costruisce strutture sericee elaborate a forma di imbuto sul substrato.
+                                Non adatto alla manipolazione: specie che si gestisce esclusivamente osservando.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — documentato comportamento costruttore di strutture sericee a imbuto</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-11: Trinidad Chevron Tarantula -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="psalmopoeus" data-gruppo="aracnidi" data-biotopo="tropicale">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Trinidad Chevron Tarantula<br>
+                            <em class="fs-6 text-muted">Psalmopoeus cambridgei</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.1 — Singolo (femmina)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Alta.<br>
+                            <strong>Costi reali stimati:</strong> ~80€ setup (terrario arboricolo con substrato umido). ~110€/anno (50€ insetti, 10€ substrato, 50€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: 30-70€.
+                                Specie arboricola, molto veloce e difensiva.
+                                Nessun pelo urticante (Nuovo Mondo) ma veleno di potenza relativamente elevata.
+                                Non adatta a neofiti.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — nota venefica e comportamento arboricolo documentati</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-12: Asian Forest Scorpion -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="heterometrus" data-gruppo="aracnidi" data-biotopo="umido">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Asian Forest Scorpion<br>
+                            <em class="fs-6 text-muted">Heterometrus silenus</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">0.0.1 — 1 giovane (sesso n.d.)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa-Media.<br>
+                            <strong>Costi reali stimati:</strong> ~60€ setup (terrario tropicale, substrato profondo per il comportamento scavatore). ~90€/anno.<br>
+                            <small class="text-muted">
+                                Veleno di bassa potenza: paragonabile alla puntura di una vespa.
+                                Punge per autodifesa, non è aggressivo.
+                                Il sessaggio in giovane età non è affidabile.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — classificazione venefica e comportamento difensivo documentati</small>
+                    </div>
+                </article>
+            </div>
+
+            <!-- D-13: Paradise Fish -->
+            <div class="col-md-6 col-lg-4">
+                <article class="card h-100 shadow-sm" id="macrophodus" data-gruppo="pesci" data-biotopo="temperato">
+
+                    <div class="card-body">
+                        <h3 class="card-title h5">
+                            Paradise Fish<br>
+                            <em class="fs-6 text-muted">Macrophodus opercularis</em>
+                        </h3>
+                        <span class="badge bg-secondary mb-2">1.0 — Singolo (maschio)</span>
+                        <hr>
+                        <p class="card-text">
+                            <strong>Difficoltà:</strong> Bassa.<br>
+                            <strong>Costi reali stimati:</strong> ~120€ setup (vasca 60L, filtro, riscaldamento facoltativo — specie euritermica). ~100€/anno (30€ cibo, 40€ energia, 30€ veterinario).<br>
+                            <small class="text-muted">
+                                Prezzo acquisto: da ~5€.
+                                Una delle prime specie ornamentali importate in Europa (fine 1800).
+                                Tollera ampie variazioni di temperatura (10-30°C).
+                                I maschi sono aggressivi tra di loro.
+                            </small>
+                        </p>
+                        <div class="alert alert-warning p-2 mt-2" role="alert">
+                            <small>
+                                <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+                                Sono animali, non macchine con manuali d'uso. Oltre all'osservazione,
+                                il costante studio è fondamentale per la corretta gestione.
+                            </small>
+                        </div>
+                    </div>
+                    <div class="card-footer text-body-secondary text-center">
+                        <small>Ultimo agg: Maggio 2026<br>Prima schedatura — nota storica importazione europea e resistenza parametri euritermici</small>
+                    </div>
+                </article>
+            </div>
+
+        </div><!-- /row Detenuti -->
+    </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-black text-center p-4 mt-auto border-top" role="contentinfo">
+    <p class="mb-0 small text-white-50">
+        &copy; 2026 reptiDON. Tutti i diritti riservati.<br>
+        <a href="#" class="text-white-50">Privacy Policy</a> |
+        <a href="#" class="text-white-50">Cookie Policy</a>
+    </p>
+</footer>
+
+
+<!-- ===== MODALE REGISTRAZIONE ===== -->
+<div class="modal fade" id="registrationModal" tabindex="-1"
+     role="dialog" aria-modal="true"
+     aria-labelledby="regModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-light border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title fw-bold" id="regModalLabel">Accedi a reptiDON</h5>
+                <button type="button" class="btn-close btn-close-white"
+                        data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-4">
+                    Registrati per il tuo premio gratuito e per accedere alle funzionalità avanzate.
+                </p>
+                <div class="d-grid gap-2 mb-3">
+                    <button class="btn btn-light fw-bold d-flex align-items-center justify-content-center gap-2" type="button">
+                        <i class="bi bi-google fs-5" aria-hidden="true"></i> Continua con Google
+                    </button>
+                    <button class="btn btn-dark border-secondary fw-bold d-flex align-items-center justify-content-center gap-2" type="button">
+                        <i class="bi bi-apple fs-5" aria-hidden="true"></i> Continua con Apple
+                    </button>
+                    <button class="btn btn-primary fw-bold d-flex align-items-center justify-content-center gap-2" type="button">
+                        <i class="bi bi-microsoft fs-5" aria-hidden="true"></i> Continua con Outlook
+                    </button>
+                </div>
+                <div class="d-flex align-items-center my-3">
+                    <hr class="flex-grow-1 border-secondary">
+                    <span class="mx-3 text-muted small">oppure via email</span>
+                    <hr class="flex-grow-1 border-secondary">
+                </div>
+                <form id="regForm" novalidate>
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label small">Email</label>
+                        <input type="email" class="form-control bg-dark text-light border-secondary"
+                               id="regEmail" placeholder="la-tua@email.it"
+                               autocomplete="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regPassword" class="form-label small">Password</label>
+                        <input type="password" class="form-control bg-dark text-light border-secondary"
+                               id="regPassword" minlength="8"
+                               autocomplete="current-password" required>
+                    </div>
+                    <div id="rD-reg-error" class="alert alert-danger py-2 small d-none" role="alert"></div>
+                    <button type="submit" class="btn btn-success w-100">Registrati</button>
+                </form>
+            </div>
+            <div class="modal-footer border-secondary justify-content-center">
+                <small class="text-muted">
+                    Continuando, accetti la nostra <a href="#" class="text-muted">Privacy Policy</a>.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ── SPLASH SCREEN ── */
+(function () {
+    var splash = document.getElementById('rD-splash');
+    if (!splash) return;
+    if (sessionStorage.getItem('rD-splash-done')) {
+        splash.style.display = 'none';
+        return;
+    }
+    var glow    = document.getElementById('rD-splash-glow');
+    var snake   = document.getElementById('rD-splash-snake');
+    var logo    = document.getElementById('rD-splash-logo');
+    var tagline = document.getElementById('rD-splash-tagline');
+    var bar     = document.getElementById('rD-splash-bar');
+    var skip    = document.getElementById('rD-splash-skip');
+
+    function splashDone() {
+        splash.classList.add('rD-splash-out');
+        sessionStorage.setItem('rD-splash-done', '1');
+        setTimeout(function () { splash.style.display = 'none'; }, 700);
+    }
+    splash.addEventListener('click', splashDone);
+
+    setTimeout(function () {
+        glow.style.transform = 'scale(1)';
+        snake.style.opacity = '1';
+        snake.style.transform = 'translateY(0)';
+        bar.style.width = '22%';
+    }, 180);
+    setTimeout(function () {
+        logo.style.opacity = '1';
+        logo.style.transform = 'translateY(0)';
+        bar.style.width = '58%';
+    }, 900);
+    setTimeout(function () {
+        tagline.style.opacity = '1';
+        tagline.style.transform = 'translateY(0)';
+        skip.style.opacity = '0.28';
+        bar.style.width = '100%';
+    }, 1650);
+    setTimeout(splashDone, 3500);
+}());
+
+/* ── PRISMA RING HOME BUTTON (rAF) ── */
+(function () {
+    var homeBtn = document.getElementById('rD-nav-home');
+    var sbHome  = document.getElementById('rD-sb-home');
+    var angle   = 0;
+        var styleEl = document.createElement('style');
+    styleEl.id  = 'rD-prisma-style';
+    document.head.appendChild(styleEl);
+
+    function updatePrisma() {
+        if (document.hidden) { rafId = requestAnimationFrame(updatePrisma); return; }
+        var isActive = homeBtn && homeBtn.classList.contains('active');
+        angle = (angle + (isActive ? 2.0 : 0.55)) % 360;
+        var grad = 'conic-gradient(from ' + angle + 'deg,' +
+            'rgba(255,0,51,0.6),rgba(255,106,0,0.6),rgba(255,224,0,0.6),' +
+            'rgba(0,255,136,0.6),rgba(0,195,255,0.6),rgba(155,0,255,0.6),' +
+            'rgba(255,0,51,0.6))';
+        styleEl.textContent =
+            '#rD-nav-home::before, #rD-sb-home::before { background: ' + grad + ' !important; }';
+                rafId = requestAnimationFrame(updatePrisma);
+    }
+    var rafId = requestAnimationFrame(updatePrisma);
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) rafId = requestAnimationFrame(updatePrisma);
+    });
+}());
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ── MODALITÀ LETTURA / FOCUS ── */
+    var btnLettura = document.getElementById('btnLettura');
+    if (btnLettura) {
+        btnLettura.addEventListener('click', function () {
+            var active = document.body.classList.toggle('mode-lettura');
+            this.setAttribute('aria-pressed', String(active));
+            this.classList.toggle('active', active);
+        });
+    }
+
+    var btnFocus = document.getElementById('btnFocus');
+    if (btnFocus) {
+        btnFocus.addEventListener('click', function () {
+            var active = document.body.classList.toggle('mode-focus');
+            this.setAttribute('aria-pressed', String(active));
+            this.classList.toggle('active', active);
+        });
+    }
+
+    /* ── FILTRI SPECIE ── */
+    var filtroGruppo  = 'tutti';
+    var filtroBiotopo = 'tutti';
+
+    function applicaFiltri() {
+        var cerca = document.getElementById('cercaSpecie').value.toLowerCase();
+        var cards = document.querySelectorAll('[data-gruppo]');
+        cards.forEach(function(card) {
+            var gruppo  = card.getAttribute('data-gruppo');
+            var biotopo = card.getAttribute('data-biotopo');
+            var testo   = card.textContent.toLowerCase();
+            var okGruppo  = filtroGruppo  === 'tutti' || gruppo  === filtroGruppo;
+            var okBiotopo = filtroBiotopo === 'tutti' || biotopo === filtroBiotopo;
+            var okCerca   = cerca === '' || testo.indexOf(cerca) !== -1;
+            var col = card.closest('.col-md-6');
+            if (col) {
+                col.classList.toggle('card-specie-hidden', !(okGruppo && okBiotopo && okCerca));
+            }
+        });
+    }
+
+    document.querySelectorAll('[data-filtro-gruppo]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            filtroGruppo = this.getAttribute('data-filtro-gruppo');
+            document.querySelectorAll('[data-filtro-gruppo]').forEach(function(b) {
+                b.classList.remove('active', 'btn-secondary');
+                b.classList.add('btn-outline-secondary');
+            });
+            this.classList.add('active', 'btn-secondary');
+            this.classList.remove('btn-outline-secondary');
+            applicaFiltri();
+        });
+    });
+
+    document.querySelectorAll('[data-filtro-biotopo]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            filtroBiotopo = this.getAttribute('data-filtro-biotopo');
+            document.querySelectorAll('[data-filtro-biotopo]').forEach(function(b) {
+                b.classList.remove('active', 'btn-secondary');
+                b.classList.add('btn-outline-secondary');
+            });
+            this.classList.add('active', 'btn-secondary');
+            this.classList.remove('btn-outline-secondary');
+            applicaFiltri();
+        });
+    });
+
+    document.getElementById('cercaSpecie').addEventListener('input', applicaFiltri);
+
+    /* ══════════════════════════════════════════
+       rD-AUTH — Simulazione account localStorage
+       Identico a index_v4.1.html
+    ══════════════════════════════════════════ */
+    var RD_AUTH_KEY = 'rD-auth';
+    var RD_DEMO_CREDENTIALS = [
+        { email: 'demo@reptidon.dev', password: 'reptidon2024', nome: 'Thomas' }
+    ];
+
+    function rdAuthGet() {
+        try {
+            var raw = localStorage.getItem(RD_AUTH_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (e) { return null; }
+    }
+    function rdAuthSet(data) {
+        try { localStorage.setItem(RD_AUTH_KEY, JSON.stringify(data)); } catch (e) {}
+    }
+    function rdAuthClear() {
+        try { localStorage.removeItem(RD_AUTH_KEY); } catch (e) {}
+    }
+
+    function rdRenderNav(auth) {
+        var profileBtn    = document.getElementById('rD-nav-profile');
+        var profileIcon   = document.getElementById('rD-nav-profile-icon');
+        var profileLabel  = document.getElementById('rD-nav-profile-label');
+        var sbProfileBtn  = document.getElementById('rD-sb-profile');
+        var sbProfileIcon = document.getElementById('rD-sb-profile-icon');
+
+        if (auth && auth.loggedIn) {
+            var nomeBreve = auth.nome.split(' ')[0];
+            if (profileBtn) {
+                profileBtn.setAttribute('data-bs-target', '#registrationModal');
+                profileBtn.setAttribute('aria-label', 'Account di ' + auth.nome);
+                profileBtn.classList.add('active');
+            }
+            if (profileIcon) {
+                profileIcon.className = 'bi bi-person-fill';
+                profileIcon.style.fontSize = '1.18rem';
+            }
+            if (profileLabel) profileLabel.textContent = nomeBreve;
+            if (sbProfileBtn) {
+                sbProfileBtn.setAttribute('data-bs-target', '#registrationModal');
+                sbProfileBtn.setAttribute('aria-label', 'Account di ' + auth.nome);
+            }
+            if (sbProfileIcon) sbProfileIcon.className = 'bi bi-person-fill';
+        } else {
+            if (profileBtn) {
+                profileBtn.setAttribute('data-bs-target', '#registrationModal');
+                profileBtn.setAttribute('aria-label', 'Accedi o registrati');
+                profileBtn.classList.remove('active');
+            }
+            if (profileIcon) {
+                profileIcon.className = 'bi bi-person-circle';
+                profileIcon.style.fontSize = '1.18rem';
+            }
+            if (profileLabel) profileLabel.textContent = 'Accedi';
+            if (sbProfileBtn) {
+                sbProfileBtn.setAttribute('data-bs-target', '#registrationModal');
+                sbProfileBtn.setAttribute('aria-label', 'Accedi o registrati');
+            }
+            if (sbProfileIcon) sbProfileIcon.className = 'bi bi-person-circle';
+        }
+    }
+
+    var rdAuth = rdAuthGet();
+    rdRenderNav(rdAuth);
+
+    /* ── LOGIN via regForm ── */
+    var regForm   = document.getElementById('regForm');
+    var regEmailEl = document.getElementById('regEmail');
+    var regPwEl    = document.getElementById('regPassword');
+    var regError   = document.getElementById('rD-reg-error');
+
+    if (regForm) {
+        regForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var email = regEmailEl ? regEmailEl.value.trim().toLowerCase() : '';
+            var pw    = regPwEl    ? regPwEl.value : '';
+            var match = null;
+
+            for (var i = 0; i < RD_DEMO_CREDENTIALS.length; i++) {
+                if (RD_DEMO_CREDENTIALS[i].email === email &&
+                    RD_DEMO_CREDENTIALS[i].password === pw) {
+                    match = RD_DEMO_CREDENTIALS[i];
+                    break;
+                }
+            }
+
+            if (match) {
+                rdAuth = { loggedIn: true, nome: match.nome, email: match.email, premioRichiesto: false };
+                rdAuthSet(rdAuth);
+                rdRenderNav(rdAuth);
+                var regModalEl   = document.getElementById('registrationModal');
+                var regModalInst = bootstrap.Modal.getInstance(regModalEl);
+                if (regModalInst) regModalInst.hide();
+                regForm.reset();
+                regForm.classList.remove('was-validated');
+                if (regError) regError.classList.add('d-none');
+            } else {
+                if (regError) {
+                    regError.textContent = 'Email o password errati. Riprova.';
+                    regError.classList.remove('d-none');
+                }
+                if (regPwEl) { regPwEl.value = ''; regPwEl.focus(); }
+            }
+        });
+
+        if (regEmailEl) regEmailEl.addEventListener('input', function () {
+            if (regError) regError.classList.add('d-none');
+        });
+        if (regPwEl) regPwEl.addEventListener('input', function () {
+            if (regError) regError.classList.add('d-none');
+        });
+    }
+
+});
+</script>
+
+</body>
+</html>
